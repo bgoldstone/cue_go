@@ -1,0 +1,17 @@
+import 'audio_playback.dart';
+
+class Cue {
+  String name;
+  String path;
+  double startPosition = 0;
+  double endPosition = 0;
+  String cueNumber = "";
+  int secondsLeft = 0;
+  late AudioPlayback player;
+  bool isAutoFollow = false;
+  CueType cueType = CueType.none;
+  bool isPlaying = false;
+  Cue(this.name, this.path);
+}
+
+enum CueType { none, autoFollow, autoContinue }
