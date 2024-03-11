@@ -1,6 +1,7 @@
 import 'package:cue_go/cue_list.dart';
 import 'package:cue_go/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const CueGo());
@@ -12,6 +13,11 @@ class CueGo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set the preferred orientation to landscape
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey, useMaterial3: true),

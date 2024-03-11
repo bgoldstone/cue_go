@@ -5,7 +5,8 @@ import 'package:cue_go/objects/audio_playback.dart';
 import 'package:cue_go/objects/cue.dart';
 import 'package:flutter/material.dart';
 
-import 'audioplayer_helpers/player_widget.dart';
+import 'cue_widgets/player_widget.dart';
+import 'cue_widgets/volume_widget.dart';
 
 /// Cue List Widget that displays the list of cues.
 class CueList extends StatefulWidget {
@@ -28,6 +29,15 @@ class _CueListState extends State<CueList> {
     cues = _project['cues'];
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    for (Cue cue in cues) {
+      cue.player.stopAudio();
+      cue.player.player.dispose();
+    }
+  }
+
   /// Gets the index of the currently selected cue.
   int getSelectedCue() {
     return selectedCue;
@@ -44,7 +54,7 @@ class _CueListState extends State<CueList> {
   void addAudioCue(String file) {
     String fileName = file.split('/').last;
     setState(() {
-      Cue cue = Cue(fileName, file);
+      Cue cue = Cue(fileName.replaceAll(RegExp('\\.[^.]*'), ""), file);
       cue.cueNumber = '${cues.length + 1}';
       cue.player = AudioPlayback();
       cues.add(cue);
@@ -56,30 +66,66 @@ class _CueListState extends State<CueList> {
   Widget cueBuilder(BuildContext context, int index) {
     const TextStyle textStyle = TextStyle(
       color: Colors.black,
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
     );
     Cue cue = cues[index];
     return GestureDetector(
       child: Card(
         color: index == selectedCue ? Colors.green : Colors.green[900],
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.all(5.0),
+          child: Column(
             children: [
-              const Icon(
-                Icons.music_note,
-                color: Colors.black,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.music_note,
+                        color: Colors.black,
+                        size: 20,
+                      ),
+                      Container(
+                        width: 100,
+                        height: 100,
+                        alignment: Alignment.center,
+                        child: Text(
+                          cue.name,
+                          style: textStyle,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        'Cue: ${cue.cueNumber}',
+                        style: textStyle,
+                      ),
+                    ],
+                  ),
+                  Container(
+                    width: 200,
+                    height: 150,
+                    alignment: Alignment.center,
+                    child: PlayerWidget(
+                      player: cue.player.player,
+                      cue: cue,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      VolumeSlider(player: cue.player.player),
+                    ],
+                  ),
+                ],
               ),
-              Text(
-                cue.name,
-                style: textStyle,
-              ),
-              Text(
-                'Cue: ${cue.cueNumber}',
-                style: textStyle,
-              ),
-              PlayerWidget(player: cue.player.player),
-              CueToggleOptions(cue: cue),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CueToggleOptions(cue: cue),
+                ],
+              )
             ],
           ),
         ),

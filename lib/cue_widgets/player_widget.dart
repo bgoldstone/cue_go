@@ -3,12 +3,16 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../objects/cue.dart';
+
 /// implementation from: https://github.com/bluefireteam/audioplayers/blob/main/packages/audioplayers/example/lib/components/player_widget.dart
 class PlayerWidget extends StatefulWidget {
   final AudioPlayer player;
+  final Cue cue;
 
   const PlayerWidget({
     required this.player,
+    required this.cue,
     super.key,
   });
 
@@ -159,7 +163,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<void> _play() async {
-    await player.resume();
+    DeviceFileSource source = DeviceFileSource(widget.cue.path);
+    widget.cue.player.player.setSource(source);
+    await player.play(source);
     setState(() => _playerState = PlayerState.playing);
   }
 

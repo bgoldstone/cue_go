@@ -14,7 +14,7 @@ class _CueToggleOptionsState extends State<CueToggleOptions> {
   CueType radioValue = CueType.none;
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         RadioMenuButton(
