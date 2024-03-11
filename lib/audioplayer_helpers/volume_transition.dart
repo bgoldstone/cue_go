@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 
-/// Add transition feature to a given [player] by [fadeObservable] and [fade]
+/// Add transition feature to a given [player] by [fadeObservable] and [fade].
+///
+/// From https://github.com/bluefireteam/audioplayers/issues/945
 class VolumeTransition {
   final AudioPlayer player;
 

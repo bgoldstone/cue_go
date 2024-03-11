@@ -1,5 +1,6 @@
 import 'audio_playback.dart';
 
+/// Cue object for the CueGo app.
 class Cue {
   String name;
   String path;

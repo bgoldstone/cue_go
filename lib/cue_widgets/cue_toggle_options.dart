@@ -9,6 +9,7 @@ class CueToggleOptions extends StatefulWidget {
   State<CueToggleOptions> createState() => _CueToggleOptionsState();
 }
 
+/// CueToggleOptions widget for auto follow and auto continue cues.
 class _CueToggleOptionsState extends State<CueToggleOptions> {
   CueType radioValue = CueType.none;
   @override

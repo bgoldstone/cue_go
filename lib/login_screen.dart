@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// LoginScreen widget for the CueGo app.
+/// TODO: Add login functionality
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

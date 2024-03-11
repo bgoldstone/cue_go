@@ -7,15 +7,15 @@ import 'package:flutter/material.dart';
 
 import 'audioplayer_helpers/player_widget.dart';
 
+/// Cue List Widget that displays the list of cues.
 class CueList extends StatefulWidget {
-  /// Cue List Widget that displays the list of cues.
-
   const CueList({super.key});
 
   @override
   State<CueList> createState() => _CueListState();
 }
 
+/// CueListState class for the CueList widget.
 class _CueListState extends State<CueList> {
   List<Cue> cues = [];
   double sliderValue = 0.0;
@@ -28,26 +28,31 @@ class _CueListState extends State<CueList> {
     cues = _project['cues'];
   }
 
-  void setSliderValue(double value) {
-    setState(() {
-      sliderValue = value;
-    });
-  }
-
-  double getSliderValue() {
-    return sliderValue;
-  }
-
+  /// Gets the index of the currently selected cue.
   int getSelectedCue() {
     return selectedCue;
   }
 
+  /// Sets the index of the currently selected cue.
   void setSelectedCue(int index) {
     setState(() {
       selectedCue = index;
     });
   }
 
+  /// Adds an audio cue to the list of cues.
+  void addAudioCue(String file) {
+    String fileName = file.split('/').last;
+    setState(() {
+      Cue cue = Cue(fileName, file);
+      cue.cueNumber = '${cues.length + 1}';
+      cue.player = AudioPlayback();
+      cues.add(cue);
+      _project['cues'] = cues;
+    });
+  }
+
+  /// Builds the ListView widget that displays the list of cues.
   Widget cueBuilder(BuildContext context, int index) {
     const TextStyle textStyle = TextStyle(
       color: Colors.black,
@@ -87,17 +92,6 @@ class _CueListState extends State<CueList> {
     );
   }
 
-  void addAudioCue(String file) {
-    String fileName = file.split('/').last;
-    setState(() {
-      Cue cue = Cue(fileName, file);
-      cue.cueNumber = '${cues.length + 1}';
-      cue.player = AudioPlayback();
-      cues.add(cue);
-      _project['cues'] = cues;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,8 +102,6 @@ class _CueListState extends State<CueList> {
                 itemBuilder: cueBuilder, itemCount: cues.length),
           ),
           PlaybackBar(
-            setSliderValue: setSliderValue,
-            getSliderValue: getSliderValue,
             cues: cues,
             setSelectedCue: setSelectedCue,
             getSelectedCue: getSelectedCue,

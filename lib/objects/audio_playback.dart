@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 import 'cue.dart';
 
+/// AudioPlayback object for the CueGo app.
 class AudioPlayback {
   AudioPlayer player = AudioPlayer();
 

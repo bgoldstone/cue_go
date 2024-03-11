@@ -2,9 +2,29 @@ import 'package:cue_go/cue_widgets/add_cues.dart';
 import 'package:cue_go/objects/cue.dart';
 import 'package:flutter/material.dart';
 
+/// PlaybackBar widget for the CueGo app.
+///
+///
+/// [setSelectedCue] is a callback function that sets the selected cue.
+///
+///
+/// [getSelectedCue] is a callback function that gets the selected cue.
+///
+///
+/// [stopCues] is a callback function that stops the playback of the cues.
+///
+///
+/// [toggleIsPlaying] is a callback function that toggles the playback of the cues.
+///
+///
+/// [updateTimeLeft] is a callback function that updates the time left in the cue.
+///
+///
+/// [cues] is a list of cues.
+///
+///
+/// [addCues] is an instance of the AddCues widget.
 class PlaybackBar extends StatefulWidget {
-  final Function(double) setSliderValue;
-  final double Function() getSliderValue;
   final Function(int) setSelectedCue;
   final int Function() getSelectedCue;
   final Function() stopCues;
@@ -13,9 +33,7 @@ class PlaybackBar extends StatefulWidget {
   final List<Cue> cues;
   final AddCues addCues;
   const PlaybackBar(
-      {required this.setSliderValue,
-      required this.getSliderValue,
-      required this.addCues,
+      {required this.addCues,
       required this.cues,
       required this.setSelectedCue,
       required this.getSelectedCue,

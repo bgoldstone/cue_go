@@ -6,6 +6,7 @@ void main() {
   runApp(const CueGo());
 }
 
+/// Main class for the CueGo app.
 class CueGo extends StatelessWidget {
   const CueGo({super.key});
 

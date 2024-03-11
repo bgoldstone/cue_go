@@ -1,10 +1,9 @@
-import 'package:cue_go/file_chooser.dart';
+import 'package:cue_go/cue_widgets/file_chooser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
+/// AddCues widget for adding cues to the CueGo project.
 class AddCues extends StatelessWidget {
-  /// AddCues widget for adding cues to the CueGo project.
-
   final Function audioCueCallback;
   final String project;
   const AddCues(
@@ -35,6 +34,7 @@ class AddCues extends StatelessWidget {
     );
   }
 
+  /// Pick an audio file from the file system and call [audioCueCallback] with
   void pickAudioFile() async {
     String? file = await pickFile();
     if (file != null) {
