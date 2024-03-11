@@ -1,4 +1,4 @@
-import 'package:cue_go/add_cues.dart';
+import 'package:cue_go/cue_widgets/add_cues.dart';
 import 'package:cue_go/objects/cue.dart';
 import 'package:flutter/material.dart';
 

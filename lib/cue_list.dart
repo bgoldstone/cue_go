@@ -1,8 +1,8 @@
-import 'package:cue_go/add_cues.dart';
-import 'package:cue_go/cue_toggle_options.dart';
+import 'package:cue_go/cue_widgets/add_cues.dart';
+import 'package:cue_go/cue_widgets/cue_toggle_options.dart';
+import 'package:cue_go/cue_widgets/playback_bar.dart';
 import 'package:cue_go/objects/audio_playback.dart';
 import 'package:cue_go/objects/cue.dart';
-import 'package:cue_go/playback_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'audioplayer_helpers/player_widget.dart';
