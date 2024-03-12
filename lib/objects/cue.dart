@@ -10,9 +10,9 @@ class Cue {
   int secondsLeft = 0;
   late AudioPlayback player;
   bool isAutoFollow = false;
-  CueOption cueType = CueOption.none;
+  CueOption cueOption = CueOption.none;
   bool isPlaying = false;
   Cue(this.name, this.path);
 }
 
-enum CueOption { none, autoFollow, autoContinue }
+enum CueOption { none, autoFollow }

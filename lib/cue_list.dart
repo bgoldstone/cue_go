@@ -102,11 +102,10 @@ class _CueListState extends State<CueList> {
       }
 
       for (Map<String, dynamic> cueMap in cueList) {
-        debugPrint(
-            'Loading Cue: ${cueMap['name']} for Project: ${projectConfig['name']}');
         Cue cue = Cue(cueMap['name'], cueMap['path']);
         cue.cueNumber = cueMap['cue_number'];
         cue.player = AudioPlayback();
+        cue.cueOption = CueOption.values[cueMap['cue_option']];
         cues.add(cue);
       }
     }
@@ -143,6 +142,7 @@ class _CueListState extends State<CueList> {
         'name': cue.name,
         'path': cue.path,
         'cue_number': cue.cueNumber,
+        'cue_option': cue.cueOption.index
       });
     }
     await saveProjectAsync(_projectConfig['name'], cueMap, appDocsDir);
@@ -239,7 +239,14 @@ class _CueListState extends State<CueList> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  CueToggleOptions(cue: cue),
+                  CueToggleOptions(
+                    cue: cue,
+                    setNewOption: (CueOption option) {
+                      cue.cueOption = option;
+                      saveProject();
+                      setState(() {});
+                    },
+                  ),
                 ],
               )
             ],
@@ -286,9 +293,9 @@ class _CueListState extends State<CueList> {
                   cues: _cues,
                   setSelectedCue: setSelectedCue,
                   getSelectedCue: getSelectedCue,
-                  stopCues: () {
+                  stopCues: () async {
                     for (Cue cue in _cues) {
-                      cue.player.stopAudio();
+                      await cue.player.stopAudio();
                       setState(() {
                         cue.isPlaying = false;
                       });

@@ -77,7 +77,8 @@ class _PlaybackBarState extends State<PlaybackBar> {
                 selectedCue.player.playAudio(
                     selectedCue.path,
                     widget.toggleIsPlaying,
-                    widget.cues[widget.getSelectedCue()],
+                    widget.cues,
+                    widget.getSelectedCue(),
                     widget.updateTimeLeft);
                 widget.setSelectedCue(
                     widget.getSelectedCue() + 1 % widget.cues.length);
