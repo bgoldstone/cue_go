@@ -74,14 +74,28 @@ class _PlaybackBarState extends State<PlaybackBar> {
               tooltip: 'Play Selected Cue',
               onPressed: () {
                 Cue selectedCue = widget.cues[widget.getSelectedCue()];
+                Cue nextCue = widget
+                    .cues[widget.getSelectedCue() + 1 % widget.cues.length];
                 selectedCue.player.playAudio(
                     selectedCue.path,
                     widget.toggleIsPlaying,
                     widget.cues,
                     widget.getSelectedCue(),
                     widget.updateTimeLeft);
-                widget.setSelectedCue(
-                    widget.getSelectedCue() + 1 % widget.cues.length);
+                widget
+                    .setSelectedCue(
+                        widget.getSelectedCue() + 1 % widget.cues.length)
+                    .then((bool autoFollow) {
+                  if (autoFollow) {
+                    widget.toggleIsPlaying(nextCue);
+                    nextCue.player.playAudio(
+                        nextCue.path,
+                        widget.toggleIsPlaying,
+                        widget.cues,
+                        widget.getSelectedCue(),
+                        widget.updateTimeLeft);
+                  }
+                });
                 setState(() {
                   selectedCue.isPlaying = true;
                 });
