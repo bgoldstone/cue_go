@@ -40,11 +40,11 @@ class _CueListState extends State<CueList> {
       cue.player.stopAudio();
       cue.player.player.dispose();
     }
-    () async {
-      await saveCueGoConfigAsync(_cueGoConfig, appDocsDir);
-      await saveProjectAsync(
-          _cueGoConfig['current_project'], _projectConfig, appDocsDir);
-    };
+    Future.wait([
+      saveCueGoConfigAsync(_cueGoConfig, appDocsDir),
+      saveProjectAsync(
+          _cueGoConfig['current_project'], _projectConfig, appDocsDir),
+    ]);
   }
 
   /// Gets the index of the currently selected cue.
@@ -111,10 +111,6 @@ class _CueListState extends State<CueList> {
       }
     }
     return cues;
-  }
-
-  String getProjectName() {
-    return _projectConfig['name'];
   }
 
   Future<void> loadProject(String projectAbsolutePath) async {
@@ -255,7 +251,7 @@ class _CueListState extends State<CueList> {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                'Project: ${getProjectName()}',
+                'Project: ${_projectConfig['name']}',
               ),
             ),
             drawer: Menu(
