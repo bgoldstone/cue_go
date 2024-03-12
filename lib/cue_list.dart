@@ -192,15 +192,28 @@ class _CueListState extends State<CueList> {
                         width: 100,
                         height: 100,
                         alignment: Alignment.center,
-                        child: Text(
-                          cue.name,
-                          style: textStyle,
-                          overflow: TextOverflow.ellipsis,
+                        child: TextButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) => editCueNameDialog(cue));
+                          },
+                          child: Text(
+                            cue.name,
+                            style: textStyle,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
-                      Text(
-                        'Cue: ${cue.cueNumber}',
-                        style: textStyle,
+                      TextButton(
+                        child: Text(
+                          'Cue: ${cue.cueNumber}',
+                          style: textStyle,
+                        ),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) => editCueNumberDialog(cue),
+                        ),
                       ),
                     ],
                   ),
@@ -309,6 +322,64 @@ class _CueListState extends State<CueList> {
           );
         }
       },
+    );
+  }
+
+  Widget editCueNumberDialog(Cue cue) {
+    TextEditingController cueNumberController =
+        TextEditingController(text: cue.cueNumber);
+    return AlertDialog(
+      title: const Text('Edit Cue Number'),
+      content: TextField(
+          controller: cueNumberController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Cue Number',
+          )),
+      actions: [
+        TextButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              setState(() {
+                cue.cueNumber = cueNumberController.text;
+              });
+              saveProject();
+              Navigator.pop(context);
+            }),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        )
+      ],
+    );
+  }
+
+  Widget editCueNameDialog(Cue cue) {
+    TextEditingController cueNumberController =
+        TextEditingController(text: cue.name);
+    return AlertDialog(
+      title: const Text('Edit Cue Name'),
+      content: TextField(
+          controller: cueNumberController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Cue Name',
+          )),
+      actions: [
+        TextButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              setState(() {
+                cue.name = cueNumberController.text;
+              });
+              saveProject();
+              Navigator.pop(context);
+            }),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        )
+      ],
     );
   }
 }
