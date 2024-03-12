@@ -74,20 +74,24 @@ class _PlaybackBarState extends State<PlaybackBar> {
               tooltip: 'Play Selected Cue',
               onPressed: () {
                 Cue selectedCue = widget.cues[widget.getSelectedCue()];
-                Cue nextCue = widget
-                    .cues[widget.getSelectedCue() + 1 % widget.cues.length];
-                selectedCue.player.playAudio(
-                    selectedCue.path,
-                    widget.toggleIsPlaying,
-                    widget.cues,
-                    widget.getSelectedCue(),
-                    widget.updateTimeLeft);
-                widget
-                    .setSelectedCue(
-                        widget.getSelectedCue() + 1 % widget.cues.length)
+                bool isNextCue =
+                    widget.getSelectedCue() + 1 < widget.cues.length;
+
+                // play audio
+                selectedCue.player
+                    .playAudio(
+                        selectedCue.path,
+                        widget.toggleIsPlaying,
+                        widget.cues,
+                        widget.getSelectedCue(),
+                        widget.updateTimeLeft)
                     .then((bool autoFollow) {
-                  if (autoFollow) {
+                  if (autoFollow && isNextCue) {
+                    Cue nextCue = widget
+                        .cues[widget.getSelectedCue() + 1 % widget.cues.length];
                     widget.toggleIsPlaying(nextCue);
+                    widget.setSelectedCue(
+                        widget.getSelectedCue() + 1 % widget.cues.length);
                     nextCue.player.playAudio(
                         nextCue.path,
                         widget.toggleIsPlaying,
@@ -96,6 +100,11 @@ class _PlaybackBarState extends State<PlaybackBar> {
                         widget.updateTimeLeft);
                   }
                 });
+                // set next selected cue.
+                if (isNextCue) {
+                  widget.setSelectedCue(
+                      widget.getSelectedCue() + 1 % widget.cues.length);
+                }
                 setState(() {
                   selectedCue.isPlaying = true;
                 });
