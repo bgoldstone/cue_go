@@ -102,6 +102,8 @@ class _CueListState extends State<CueList> {
       }
 
       for (Map<String, dynamic> cueMap in cueList) {
+        debugPrint(
+            'Loading Cue: ${cueMap['name']} for Project: ${projectConfig['name']}');
         Cue cue = Cue(cueMap['name'], cueMap['path']);
         cue.cueNumber = cueMap['cue_number'];
         cue.player = AudioPlayback();
@@ -115,7 +117,7 @@ class _CueListState extends State<CueList> {
     return _projectConfig['name'];
   }
 
-  Future<void> loadProjectByFile(String projectAbsolutePath) async {
+  Future<void> loadProject(String projectAbsolutePath) async {
     // Save Current Project.
     await saveProject();
     // Load New Project.
@@ -133,8 +135,6 @@ class _CueListState extends State<CueList> {
       _projectConfig = project;
       _cueGoConfig = newCueGoConfig;
     });
-    // saves new project.
-    await saveProject();
   }
 
   Future<void> saveProject() async {
@@ -160,7 +160,6 @@ class _CueListState extends State<CueList> {
     _cueGoConfig['current_project'] = projectName;
     _projectConfig = newProject;
     _projectConfig['name'] = projectName;
-    await saveProject();
     await saveCueGoConfigAsync(_cueGoConfig, appDocsDir);
     setState(() {});
   }
@@ -263,7 +262,7 @@ class _CueListState extends State<CueList> {
               currentRouteName: '/cues',
               newProject: createNewProject,
               appDocsDir: appDocsDir,
-              loadProject: loadProjectByFile,
+              loadProject: loadProject,
               saveProject: saveProject,
             ),
             body: Column(

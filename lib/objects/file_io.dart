@@ -56,7 +56,8 @@ Future<Map<String, dynamic>> getProjectAsync(
 /// Get the absolute path of the project file and loads it if it exists.
 Future<Map<String, dynamic>> getAbsoluteProjectAsync(
     String projectPath, Directory appDocsDir) async {
-  File file = File(projectPath);
+  File file = File('$projectPath.json');
+  debugPrint(file.path);
   if (await file.exists()) {
     String config = await file.readAsString();
     return jsonDecode(config);

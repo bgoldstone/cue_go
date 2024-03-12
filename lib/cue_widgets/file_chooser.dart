@@ -19,5 +19,5 @@ Future<String?> pickProject(Directory appDocsDir) async {
   );
   if (result == null) return null;
   // Returns the path of the picked file.
-  return result.files.single.path!.split('/').last.replaceAll(".json", '');
+  return result.files.single.path?.replaceAll(".json", '');
 }
