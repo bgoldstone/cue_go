@@ -11,7 +11,7 @@ class CueToggleOptions extends StatefulWidget {
 
 /// CueToggleOptions widget for auto follow and auto continue cues.
 class _CueToggleOptionsState extends State<CueToggleOptions> {
-  CueType radioValue = CueType.none;
+  CueOption radioValue = CueOption.none;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -20,11 +20,11 @@ class _CueToggleOptionsState extends State<CueToggleOptions> {
         Tooltip(
           message: 'No Follow or Continue',
           child: RadioMenuButton(
-            value: CueType.none,
+            value: CueOption.none,
             groupValue: widget.cue.cueType,
             onChanged: (newValue) {
               setState(() {
-                widget.cue.cueType = CueType.none;
+                widget.cue.cueType = CueOption.none;
               });
             },
             child: const Icon(Icons.not_interested),
@@ -33,11 +33,11 @@ class _CueToggleOptionsState extends State<CueToggleOptions> {
         Tooltip(
           message: 'Auto Follow',
           child: RadioMenuButton(
-            value: CueType.autoContinue,
+            value: CueOption.autoContinue,
             groupValue: widget.cue.cueType,
             onChanged: (newValue) {
               setState(() {
-                widget.cue.cueType = CueType.autoContinue;
+                widget.cue.cueType = CueOption.autoContinue;
               });
             },
             child: const Icon(Icons.keyboard_arrow_down),
@@ -46,11 +46,11 @@ class _CueToggleOptionsState extends State<CueToggleOptions> {
         Tooltip(
           message: 'Auto Continue',
           child: RadioMenuButton(
-            value: CueType.autoFollow,
+            value: CueOption.autoFollow,
             groupValue: widget.cue.cueType,
             onChanged: (newValue) {
               setState(() {
-                widget.cue.cueType = CueType.autoFollow;
+                widget.cue.cueType = CueOption.autoFollow;
               });
             },
             child: const Icon(Icons.keyboard_double_arrow_down),
