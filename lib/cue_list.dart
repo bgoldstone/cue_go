@@ -65,7 +65,7 @@ class _CueListState extends State<CueList> {
     });
   }
 
-  Future<void> getCueGoConfigAndProject() async {
+  Future<bool> getCueGoConfigAndProject() async {
     appDocsDir = await getAppDocsDir();
     Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
     Map<String, dynamic> projectConfig =
@@ -75,7 +75,7 @@ class _CueListState extends State<CueList> {
       _projectConfig = projectConfig;
     });
     loadProject();
-    return;
+    return true;
   }
 
   void loadProject() {
@@ -190,8 +190,9 @@ class _CueListState extends State<CueList> {
 
   @override
   Widget build(BuildContext context) {
+    final Future<void> initializeProject = getCueGoConfigAndProject();
     return FutureBuilder(
-      future: getCueGoConfigAndProject(),
+      future: initializeProject,
       builder: (context, future) {
         if (future.hasData) {
           return Scaffold(
