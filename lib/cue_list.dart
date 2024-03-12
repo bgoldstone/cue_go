@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cue_go/cue_widgets/add_cues.dart';
 import 'package:cue_go/cue_widgets/cue_toggle_options.dart';
 import 'package:cue_go/cue_widgets/playback_bar.dart';
 import 'package:cue_go/objects/audio_playback.dart';
 import 'package:cue_go/objects/cue.dart';
+import 'package:cue_go/objects/file_io.dart';
 import 'package:flutter/material.dart';
 
 import 'cue_widgets/player_widget.dart';
@@ -20,13 +23,13 @@ class CueList extends StatefulWidget {
 class _CueListState extends State<CueList> {
   List<Cue> cues = [];
   double sliderValue = 0.0;
-  final Map<String, dynamic> _project = {'cues': <Cue>[]};
-  final Map<String, dynamic> _cueConfig = {'current_project': 'Test'};
+  Map<String, dynamic> _projectConfig = {};
+  Map<String, dynamic> _cueGoConfig = {};
   int selectedCue = 0;
+  late Directory appDocsDir;
   @override
   void initState() {
     super.initState();
-    cues = _project['cues'];
   }
 
   @override
@@ -58,8 +61,55 @@ class _CueListState extends State<CueList> {
       cue.cueNumber = '${cues.length + 1}';
       cue.player = AudioPlayback();
       cues.add(cue);
-      _project['cues'] = cues;
+      _projectConfig['cues'] = cues;
     });
+  }
+
+  Future<void> getCueGoConfigAndProject() async {
+    appDocsDir = await getAppDocsDir();
+    Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
+    Map<String, dynamic> projectConfig =
+        await getProjectAsync(cueGoConfig['current_project'], appDocsDir);
+    setState(() {
+      _cueGoConfig = cueGoConfig;
+      _projectConfig = projectConfig;
+    });
+    loadProject();
+    return;
+  }
+
+  void loadProject() {
+    if (_projectConfig['cues'] == null) {
+      cues = [];
+    }
+    List<Map<String, dynamic>> cueList =
+        List<Map<String, dynamic>>.from(_projectConfig['cues']);
+
+    if (cueList.isEmpty) {
+      return;
+    }
+    for (Map<String, dynamic> cueMap in cueList) {
+      Cue cue = Cue(cueMap['name'], cueMap['path']);
+      cue.cueNumber = cueMap['cue_number'];
+      cue.player = AudioPlayback();
+      setState(() {
+        cues.add(cue);
+      });
+    }
+  }
+
+  void saveProject() async {
+    Map<String, dynamic> cueMap = {
+      'cues': [],
+    };
+    for (Cue cue in cues) {
+      cueMap['cues'].add({
+        'name': cue.name,
+        'path': cue.path,
+        'cue_number': cue.cueNumber,
+      });
+    }
+    await saveProjectAsync(_cueGoConfig['current_project'], cueMap, appDocsDir);
   }
 
   /// Builds the ListView widget that displays the list of cues.
@@ -140,42 +190,57 @@ class _CueListState extends State<CueList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-                itemBuilder: cueBuilder, itemCount: cues.length),
-          ),
-          PlaybackBar(
-            cues: cues,
-            setSelectedCue: setSelectedCue,
-            getSelectedCue: getSelectedCue,
-            stopCues: () {
-              for (Cue cue in cues) {
-                cue.player.stopAudio();
-                setState(() {
-                  cue.isPlaying = false;
-                });
-              }
-            },
-            toggleIsPlaying: (cue) {
-              setState(() {
-                cue.isPlaying = !cue.isPlaying;
-              });
-            },
-            updateTimeLeft: (cue, secondsLeft) {
-              setState(() {
-                cue.secondsLeft = secondsLeft;
-              });
-            },
-            addCues: AddCues(
-              audioCueCallback: addAudioCue,
-              project: _cueConfig['current_project'],
+    return FutureBuilder(
+      future: getCueGoConfigAndProject(),
+      builder: (context, future) {
+        if (future.hasData) {
+          return Scaffold(
+            body: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                      itemBuilder: cueBuilder, itemCount: cues.length),
+                ),
+                PlaybackBar(
+                  cues: cues,
+                  setSelectedCue: setSelectedCue,
+                  getSelectedCue: getSelectedCue,
+                  stopCues: () {
+                    for (Cue cue in cues) {
+                      cue.player.stopAudio();
+                      setState(() {
+                        cue.isPlaying = false;
+                      });
+                    }
+                  },
+                  toggleIsPlaying: (cue) {
+                    setState(() {
+                      cue.isPlaying = !cue.isPlaying;
+                    });
+                  },
+                  updateTimeLeft: (cue, secondsLeft) {
+                    setState(() {
+                      cue.secondsLeft = secondsLeft;
+                    });
+                  },
+                  addCues: AddCues(
+                    audioCueCallback: addAudioCue,
+                    project: _cueGoConfig['current_project'],
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        } else if (future.hasError) {
+          throw future.error.toString();
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          );
+        }
+      },
     );
   }
 }
