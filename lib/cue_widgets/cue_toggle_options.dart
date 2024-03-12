@@ -17,35 +17,44 @@ class _CueToggleOptionsState extends State<CueToggleOptions> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        RadioMenuButton(
-          value: CueType.none,
-          groupValue: widget.cue.cueType,
-          onChanged: (newValue) {
-            setState(() {
-              widget.cue.cueType = CueType.none;
-            });
-          },
-          child: const Icon(Icons.not_interested),
+        Tooltip(
+          message: 'No Follow or Continue',
+          child: RadioMenuButton(
+            value: CueType.none,
+            groupValue: widget.cue.cueType,
+            onChanged: (newValue) {
+              setState(() {
+                widget.cue.cueType = CueType.none;
+              });
+            },
+            child: const Icon(Icons.not_interested),
+          ),
         ),
-        RadioMenuButton(
-          value: CueType.autoContinue,
-          groupValue: widget.cue.cueType,
-          onChanged: (newValue) {
-            setState(() {
-              widget.cue.cueType = CueType.autoContinue;
-            });
-          },
-          child: const Icon(Icons.keyboard_arrow_down),
+        Tooltip(
+          message: 'Auto Follow',
+          child: RadioMenuButton(
+            value: CueType.autoContinue,
+            groupValue: widget.cue.cueType,
+            onChanged: (newValue) {
+              setState(() {
+                widget.cue.cueType = CueType.autoContinue;
+              });
+            },
+            child: const Icon(Icons.keyboard_arrow_down),
+          ),
         ),
-        RadioMenuButton(
-          value: CueType.autoFollow,
-          groupValue: widget.cue.cueType,
-          onChanged: (newValue) {
-            setState(() {
-              widget.cue.cueType = CueType.autoFollow;
-            });
-          },
-          child: const Icon(Icons.keyboard_double_arrow_down),
+        Tooltip(
+          message: 'Auto Continue',
+          child: RadioMenuButton(
+            value: CueType.autoFollow,
+            groupValue: widget.cue.cueType,
+            onChanged: (newValue) {
+              setState(() {
+                widget.cue.cueType = CueType.autoFollow;
+              });
+            },
+            child: const Icon(Icons.keyboard_double_arrow_down),
+          ),
         ),
       ],
     );
