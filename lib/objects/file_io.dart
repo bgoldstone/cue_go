@@ -31,6 +31,7 @@ Future<Map<String, dynamic>> createCueGoConfigAsync(
   Map<String, dynamic> config = jsonDecode(rootBundleLocation);
   File file = File('${appDocsDir.path}/cue_go.conf');
   await file.writeAsString(jsonEncode(config));
+  debugPrint('Created cue_go.conf');
 
   return config;
 }
@@ -52,13 +53,25 @@ Future<Map<String, dynamic>> getProjectAsync(
   }
 }
 
+/// Get the absolute path of the project file and loads it if it exists.
+Future<Map<String, dynamic>> getAbsoluteProjectAsync(
+    String projectPath, Directory appDocsDir) async {
+  File file = File(projectPath);
+  if (await file.exists()) {
+    String config = await file.readAsString();
+    return jsonDecode(config);
+  }
+  String fileName = projectPath.split('/').last.replaceAll(".json", "");
+  return createProjectAsync(fileName, appDocsDir);
+}
+
 Future<Map<String, dynamic>> createProjectAsync(
     String projectName, Directory appDocsDir) async {
   String rootBundleLocation =
       await rootBundle.loadString('assets/default_config/default.json');
   Map<String, dynamic> config = jsonDecode(rootBundleLocation);
-  debugPrint(config.toString());
   File file = File('${appDocsDir.path}/$projectName.json');
+  config['name'] = projectName;
   await file.writeAsString(jsonEncode(config));
   return config;
 }
@@ -67,4 +80,10 @@ Future<void> saveProjectAsync(String projectName, Map<String, dynamic> config,
     Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/$projectName.json');
   await file.writeAsString(jsonEncode(config));
+}
+
+Future<bool> projectExistsAsync(String projectName) async {
+  Directory appDocsDir = await getAppDocsDir();
+  File file = File('${appDocsDir.path}/$projectName.json');
+  return await file.exists();
 }

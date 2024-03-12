@@ -36,7 +36,7 @@ class AddCues extends StatelessWidget {
 
   /// Pick an audio file from the file system and call [audioCueCallback] with
   void pickAudioFile() async {
-    String? file = await pickFile();
+    String? file = await pickAudio();
     if (file != null) {
       audioCueCallback(file);
     }
