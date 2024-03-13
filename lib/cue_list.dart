@@ -218,15 +218,15 @@ class _CueListState extends State<CueList> {
                     ],
                   ),
                   // Displays the player widget
-                  Container(
-                    width: 200,
-                    height: 150,
-                    alignment: Alignment.center,
-                    child: PlayerWidget(
-                      player: cue.player.player,
-                      cue: cue,
-                    ),
-                  ),
+                  // Container(
+                  //   width: 200,
+                  //   height: 150,
+                  //   alignment: Alignment.center,
+                  //   child: PlayerWidget(
+                  //     player: cue.player.player,
+                  //     cue: cue,
+                  //   ),
+                  // ),
                   // Displays the volume slider
                   Row(
                     children: [
