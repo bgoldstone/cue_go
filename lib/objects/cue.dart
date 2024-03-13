@@ -15,4 +15,5 @@ class Cue {
   Cue(this.name, this.path);
 }
 
+/// CueOption enum for the CueGo app.
 enum CueOption { none, autoFollow }

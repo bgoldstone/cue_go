@@ -9,7 +9,6 @@ import 'package:cue_go/objects/cue.dart';
 import 'package:cue_go/objects/file_io.dart';
 import 'package:flutter/material.dart';
 
-import 'cue_widgets/player_widget.dart';
 import 'cue_widgets/volume_widget.dart';
 
 /// Cue List Widget that displays the list of cues.
@@ -40,6 +39,7 @@ class _CueListState extends State<CueList> {
       cue.player.stopAudio();
       cue.player.player.dispose();
     }
+    // Saves the current project and the cue go config.
     Future.wait([
       saveCueGoConfigAsync(_cueGoConfig, appDocsDir),
       saveProjectAsync(
@@ -61,23 +61,31 @@ class _CueListState extends State<CueList> {
 
   /// Adds an audio cue to the list of cues.
   void addAudioCue(String filePath) {
+    // gets filename from filepath.
     String fileName = filePath.split('/').last;
+    //removes file extension.
     String fileNameWithoutExtension =
         fileName.replaceAll(RegExp('\\.[^.]*'), "");
+    // creates a cue with the filename and filepath.
     Cue cue = Cue(fileNameWithoutExtension, filePath);
+    // Sets a default cue number.
     cue.cueNumber = '${_cues.length + 1}';
+    //adds new playback object.
     cue.player = AudioPlayback();
 
     _cues.add(cue);
+    //adds audio cue to project config.
     _projectConfig['cues'].add({
       'name': fileNameWithoutExtension,
       'path': filePath,
       'cue_number': cue.cueNumber
     });
+    // Saves the project config.
     saveProject();
     setState(() {});
   }
 
+  /// Loads the project and the cue go config.
   Future<bool> getCueGoConfigAndProject() async {
     appDocsDir = await getAppDocsDir();
     Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
@@ -92,6 +100,7 @@ class _CueListState extends State<CueList> {
     return true;
   }
 
+  /// Loads the cues from the project config into the cue list.
   List<Cue> loadCues(Map<String, dynamic> projectConfig) {
     List<Cue> cues = [];
     if (projectConfig['cues'] != null) {
@@ -100,7 +109,7 @@ class _CueListState extends State<CueList> {
       if (cueList.isEmpty) {
         return [];
       }
-
+      // maps the cue attributes to the cue object.
       for (Map<String, dynamic> cueMap in cueList) {
         Cue cue = Cue(cueMap['name'], cueMap['path']);
         cue.cueNumber = cueMap['cue_number'];
@@ -112,6 +121,9 @@ class _CueListState extends State<CueList> {
     return cues;
   }
 
+  /// Loads the project and saves the current project.
+  /// also updates the cue go config.
+  /// @param projectAbsolutePath the absolute path of the project.
   Future<void> loadProject(String projectAbsolutePath) async {
     // Save Current Project.
     await saveProject();
@@ -132,11 +144,13 @@ class _CueListState extends State<CueList> {
     });
   }
 
+  /// Saves the current project.
   Future<void> saveProject() async {
     Map<String, dynamic> cueMap = {
       'name': _projectConfig['name'],
       'cues': [],
     };
+    // Converts the cues into a map.
     for (Cue cue in _cues) {
       cueMap['cues'].add({
         'name': cue.name,
@@ -148,6 +162,9 @@ class _CueListState extends State<CueList> {
     await saveProjectAsync(_projectConfig['name'], cueMap, appDocsDir);
   }
 
+  /// Creates a new project.
+  ///
+  /// @param name The name of the project.
   Future<void> createNewProject(String projectName) async {
     await saveProject();
     Map<String, dynamic> newProject =
@@ -161,12 +178,15 @@ class _CueListState extends State<CueList> {
   }
 
   /// Builds the ListView widget that displays the list of cues.
+  /// @param context the context of the widget.
+  /// @param index the index of the cue.
   Widget cueBuilder(BuildContext context, int index) {
     const TextStyle textStyle = TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.bold,
       fontSize: 15,
     );
+    // get the cue at the index.
     Cue cue = _cues[index];
     return GestureDetector(
       child: Card(
@@ -253,6 +273,7 @@ class _CueListState extends State<CueList> {
           ),
         ),
       ),
+      // Changes the current cue to the selected cue.
       onTap: () {
         setState(() {
           selectedCue = index;
@@ -332,6 +353,7 @@ class _CueListState extends State<CueList> {
     );
   }
 
+  /// Shows a dialog for editing the cue number of the cue.
   Widget editCueNumberDialog(Cue cue) {
     TextEditingController cueNumberController =
         TextEditingController(text: cue.cueNumber);
@@ -361,6 +383,7 @@ class _CueListState extends State<CueList> {
     );
   }
 
+  /// Shows a dialog for editing the cue name of the cue.
   Widget editCueNameDialog(Cue cue) {
     TextEditingController cueNumberController =
         TextEditingController(text: cue.name);

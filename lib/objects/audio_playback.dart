@@ -6,6 +6,7 @@ import 'cue.dart';
 class AudioPlayback {
   AudioPlayer player = AudioPlayer();
 
+  /// Plays the audio.
   Future<bool> playAudio(String file, Function(Cue) onComplete, List<Cue> cues,
       int cueIndex, void Function(Cue, int) updateTimeLeft) async {
     DeviceFileSource source = DeviceFileSource(file);
@@ -26,10 +27,12 @@ class AudioPlayback {
     return Future<bool>.value(returnValue);
   }
 
+  /// Stops the audio.
   Future<void> stopAudio() async {
     await player.stop();
   }
 
+  /// Pauses the audio.
   Future<void> pauseAudio() async {
     await player.pause();
   }

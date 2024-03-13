@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Gets the Application Documents directory from path_provider package.
 Future<Directory> getAppDocsDir() async {
   Directory dir = await getApplicationDocumentsDirectory();
   Directory cueGo = Directory('${dir.path}/cue_go');
@@ -14,6 +15,9 @@ Future<Directory> getAppDocsDir() async {
   return cueGo;
 }
 
+/// Gets the Cue Go configuration directory from path_provider package.
+/// If the configuration does not exist, it creates it.
+/// @param appDocsDir the application documents directory.
 Future<Map<String, dynamic>> getCueGoConfigAsync(Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/cue_go.conf');
   if (await file.exists()) {
@@ -24,6 +28,8 @@ Future<Map<String, dynamic>> getCueGoConfigAsync(Directory appDocsDir) async {
   }
 }
 
+/// Creates the Cue Go configuration if it does not exist.
+/// @param appDocsDir the application documents directory.s
 Future<Map<String, dynamic>> createCueGoConfigAsync(
     Directory appDocsDir) async {
   String rootBundleLocation =
@@ -36,12 +42,18 @@ Future<Map<String, dynamic>> createCueGoConfigAsync(
   return config;
 }
 
+/// Save thecue Go configuration.
+/// @param config the updated cue go configuration.
+/// @param appDocsDir the application documents directory.
 Future<void> saveCueGoConfigAsync(
     Map<String, dynamic> config, Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/cue_go.conf');
   await file.writeAsString(jsonEncode(config));
 }
 
+/// Get the project from the project name and loads it if it exists.
+/// @param projectName the name of the project.
+/// @param appDocsDir the application documents directory.
 Future<Map<String, dynamic>> getProjectAsync(
     String projectName, Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/$projectName.json');
@@ -54,6 +66,8 @@ Future<Map<String, dynamic>> getProjectAsync(
 }
 
 /// Get the absolute path of the project file and loads it if it exists.
+/// @param projectPath the absolute path of the project.
+/// @param appDocsDir the application documents directory.
 Future<Map<String, dynamic>> getAbsoluteProjectAsync(
     String projectPath, Directory appDocsDir) async {
   File file = File('$projectPath.json');
@@ -66,6 +80,9 @@ Future<Map<String, dynamic>> getAbsoluteProjectAsync(
   return createProjectAsync(fileName, appDocsDir);
 }
 
+/// Creates a new project and loads it.
+/// @param projectName the name of the project.
+/// @param appDocsDir the application documents directory.
 Future<Map<String, dynamic>> createProjectAsync(
     String projectName, Directory appDocsDir) async {
   String rootBundleLocation =
@@ -77,14 +94,21 @@ Future<Map<String, dynamic>> createProjectAsync(
   return config;
 }
 
+/// Saves the project to the Application Documents Directory.
+/// @param projectName the name of the project.
+/// @param config the project configuration.
+/// @param appDocsDir the application documents directory.
 Future<void> saveProjectAsync(String projectName, Map<String, dynamic> config,
     Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/$projectName.json');
   await file.writeAsString(jsonEncode(config));
 }
 
-Future<bool> projectExistsAsync(String projectName) async {
-  Directory appDocsDir = await getAppDocsDir();
+/// Checks if the project exists.
+/// @param projectName the name of the project.
+/// @param appDocsDir the application documents directory.
+Future<bool> projectExistsAsync(
+    String projectName, Directory appDocsDir) async {
   File file = File('${appDocsDir.path}/$projectName.json');
   return await file.exists();
 }

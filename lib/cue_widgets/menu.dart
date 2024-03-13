@@ -29,12 +29,14 @@ class _MenuState extends State<Menu> {
     return Drawer(
       child: ListView(
         children: <Widget>[
+          // Drawer header
           const DrawerHeader(
             decoration: BoxDecoration(
               color: Colors.purple,
             ),
             child: Text("CueGo Menu"),
           ),
+          // Opens the Cues Page if it is not already open.
           ListTile(
             title: const Text("Cues"),
             onTap: () {
@@ -45,6 +47,7 @@ class _MenuState extends State<Menu> {
               }
             },
           ),
+          // Allows the user to create a new project.
           ListTile(
             title: const Text("Create New Project"),
             onTap: () {
@@ -55,6 +58,8 @@ class _MenuState extends State<Menu> {
                   });
             },
           ),
+
+          /// Loads an existing project using a file chooser.
           ListTile(
             title: const Text("Load Project"),
             onTap: () {
@@ -73,6 +78,9 @@ class _MenuState extends State<Menu> {
     );
   }
 
+  /// Loads an existing project using a file chooser.
+  /// Helper function for Drawer Widget.
+  /// @param context the context of the widget.
   void loadExistingProject(BuildContext context) {
     pickProject(widget.appDocsDir).then(
       (file) => {
@@ -89,6 +97,10 @@ class _MenuState extends State<Menu> {
     );
   }
 
+  /// Creates a dialog for creating a new project.
+  /// @param newProjectController the controller for the new project name.
+  /// @param context the context of the widget.
+  /// @returns a dialog for creating a new project.
   AlertDialog createProjectDialog(
       TextEditingController newProjectController, BuildContext context) {
     return AlertDialog(
@@ -113,7 +125,8 @@ class _MenuState extends State<Menu> {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
-            projectExistsAsync(newProjectController.text).then((value) {
+            projectExistsAsync(newProjectController.text, widget.appDocsDir)
+                .then((value) {
               projectExistsAction(value, context, newProjectController);
             });
           },
@@ -123,6 +136,7 @@ class _MenuState extends State<Menu> {
     );
   }
 
+  /// If the project already exists, shows an error dialog.
   void projectExistsAction(bool projectExists, BuildContext context,
       TextEditingController newProjectController) {
     if (projectExists) {

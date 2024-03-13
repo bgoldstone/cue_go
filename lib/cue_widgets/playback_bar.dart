@@ -60,6 +60,7 @@ class _PlaybackBarState extends State<PlaybackBar> {
           //   value: widget.getSliderValue(),
 
           // ),
+          /// Button to play the currently selected cue.
           Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
@@ -111,6 +112,8 @@ class _PlaybackBarState extends State<PlaybackBar> {
               },
             ),
           ),
+
+          /// Button to pause the currently selected cue.
           IconButton(
             icon: const Icon(Icons.pause),
             iconSize: iconSize,
@@ -127,6 +130,8 @@ class _PlaybackBarState extends State<PlaybackBar> {
               }
             },
           ),
+
+          /// Button to stop the currently selected cue.
           IconButton(
             icon: const Icon(Icons.stop),
             iconSize: iconSize,
