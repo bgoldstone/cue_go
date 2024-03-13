@@ -293,9 +293,9 @@ class _CueListState extends State<CueList> {
                   cues: _cues,
                   setSelectedCue: setSelectedCue,
                   getSelectedCue: getSelectedCue,
-                  stopCues: () {
+                  stopCues: () async {
                     for (Cue cue in _cues) {
-                      cue.player.stopAudio();
+                      await cue.player.stopAudio();
                       setState(() {
                         cue.isPlaying = false;
                       });

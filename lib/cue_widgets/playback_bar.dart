@@ -132,7 +132,9 @@ class _PlaybackBarState extends State<PlaybackBar> {
             iconSize: iconSize,
             color: iconColor,
             tooltip: 'Stop All Cues',
-            onPressed: widget.stopCues,
+            onPressed: () {
+              widget.stopCues().then((callback) {});
+            },
           ),
           widget.addCues,
         ],
