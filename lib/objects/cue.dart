@@ -11,7 +11,6 @@ class Cue {
   late AudioPlayback player;
   bool isAutoFollow = false;
   CueOption cueOption = CueOption.none;
-  bool isPlaying = false;
   Cue(this.name, this.path);
 }
 

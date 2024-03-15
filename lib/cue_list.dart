@@ -36,7 +36,7 @@ class _CueListState extends State<CueList> {
   void dispose() {
     super.dispose();
     for (Cue cue in _cues) {
-      cue.player.stopAudio();
+      cue.player.player.stop();
       cue.player.player.dispose();
     }
     // Saves the current project and the cue go config.
@@ -71,7 +71,7 @@ class _CueListState extends State<CueList> {
     // Sets a default cue number.
     cue.cueNumber = '${_cues.length + 1}';
     //adds new playback object.
-    cue.player = AudioPlayback();
+    cue.player = AudioPlayback(cueListState: setState);
 
     _cues.add(cue);
     //adds audio cue to project config.
@@ -113,7 +113,7 @@ class _CueListState extends State<CueList> {
       for (Map<String, dynamic> cueMap in cueList) {
         Cue cue = Cue(cueMap['name'], cueMap['path']);
         cue.cueNumber = cueMap['cue_number'];
-        cue.player = AudioPlayback();
+        cue.player = AudioPlayback(cueListState: setState);
         cue.cueOption = CueOption.values[cueMap['cue_option']];
         cues.add(cue);
       }
@@ -314,19 +314,6 @@ class _CueListState extends State<CueList> {
                   cues: _cues,
                   setSelectedCue: setSelectedCue,
                   getSelectedCue: getSelectedCue,
-                  stopCues: () async {
-                    for (Cue cue in _cues) {
-                      await cue.player.stopAudio();
-                      setState(() {
-                        cue.isPlaying = false;
-                      });
-                    }
-                  },
-                  toggleIsPlaying: (cue) {
-                    setState(() {
-                      cue.isPlaying = !cue.isPlaying;
-                    });
-                  },
                   updateTimeLeft: (cue, secondsLeft) {
                     setState(() {
                       cue.secondsLeft = secondsLeft;
@@ -336,6 +323,7 @@ class _CueListState extends State<CueList> {
                     audioCueCallback: addAudioCue,
                     project: _cueGoConfig['current_project'],
                   ),
+                  cueListState: setState,
                 ),
               ],
             ),

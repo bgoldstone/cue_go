@@ -11,12 +11,6 @@ import 'package:flutter/material.dart';
 /// [getSelectedCue] is a callback function that gets the selected cue.
 ///
 ///
-/// [stopCues] is a callback function that stops the playback of the cues.
-///
-///
-/// [toggleIsPlaying] is a callback function that toggles the playback of the cues.
-///
-///
 /// [updateTimeLeft] is a callback function that updates the time left in the cue.
 ///
 ///
@@ -27,19 +21,17 @@ import 'package:flutter/material.dart';
 class PlaybackBar extends StatefulWidget {
   final Function(int) setSelectedCue;
   final int Function() getSelectedCue;
-  final Function() stopCues;
-  final Function(Cue) toggleIsPlaying;
   final Function(Cue, int) updateTimeLeft;
   final List<Cue> cues;
   final AddCues addCues;
+  final void Function(void Function()) cueListState;
   const PlaybackBar(
       {required this.addCues,
       required this.cues,
       required this.setSelectedCue,
       required this.getSelectedCue,
-      required this.stopCues,
-      required this.toggleIsPlaying,
       required this.updateTimeLeft,
+      required this.cueListState,
       super.key});
 
   @override
@@ -74,40 +66,30 @@ class _PlaybackBarState extends State<PlaybackBar> {
               splashRadius: 5,
               tooltip: 'Play Selected Cue',
               onPressed: () {
-                Cue selectedCue = widget.cues[widget.getSelectedCue()];
-                bool isNextCue =
-                    widget.getSelectedCue() + 1 < widget.cues.length;
+                widget.cueListState(() {
+                  Cue selectedCue = widget.cues[widget.getSelectedCue()];
+                  bool isNextCue =
+                      widget.getSelectedCue() + 1 < widget.cues.length;
 
-                // play audio
-                selectedCue.player
-                    .playAudio(
-                        selectedCue.path,
-                        widget.toggleIsPlaying,
-                        widget.cues,
-                        widget.getSelectedCue(),
-                        widget.updateTimeLeft)
-                    .then((bool autoFollow) {
-                  if (autoFollow && isNextCue) {
-                    Cue nextCue = widget
-                        .cues[widget.getSelectedCue() + 1 % widget.cues.length];
-                    widget.toggleIsPlaying(nextCue);
+                  // play audio
+                  selectedCue.player
+                      .playAudio(selectedCue.path, widget.cues,
+                          widget.getSelectedCue(), widget.updateTimeLeft)
+                      .then((bool autoFollow) {
+                    if (autoFollow && isNextCue) {
+                      Cue nextCue = widget.cues[
+                          widget.getSelectedCue() + 1 % widget.cues.length];
+                      widget.setSelectedCue(
+                          widget.getSelectedCue() + 1 % widget.cues.length);
+                      nextCue.player.playAudio(nextCue.path, widget.cues,
+                          widget.getSelectedCue(), widget.updateTimeLeft);
+                    }
+                  });
+                  // set next selected cue.
+                  if (isNextCue) {
                     widget.setSelectedCue(
                         widget.getSelectedCue() + 1 % widget.cues.length);
-                    nextCue.player.playAudio(
-                        nextCue.path,
-                        widget.toggleIsPlaying,
-                        widget.cues,
-                        widget.getSelectedCue(),
-                        widget.updateTimeLeft);
                   }
-                });
-                // set next selected cue.
-                if (isNextCue) {
-                  widget.setSelectedCue(
-                      widget.getSelectedCue() + 1 % widget.cues.length);
-                }
-                setState(() {
-                  selectedCue.isPlaying = true;
                 });
               },
             ),
@@ -120,14 +102,15 @@ class _PlaybackBarState extends State<PlaybackBar> {
             color: iconColor,
             tooltip: 'Pause All Cues',
             onPressed: () async {
-              for (Cue cue in widget.cues) {
-                if (cue.isPlaying) {
-                  cue.player.pauseAudio();
-                  setState(() {
-                    cue.isPlaying = false;
-                  });
-                }
-              }
+              widget.cueListState(
+                () {
+                  for (Cue cue in widget.cues) {
+                    if (cue.player.isPlaying()) {
+                      cue.player.pauseAudio();
+                    }
+                  }
+                },
+              );
             },
           ),
 
@@ -138,7 +121,16 @@ class _PlaybackBarState extends State<PlaybackBar> {
             color: iconColor,
             tooltip: 'Stop All Cues',
             onPressed: () {
-              widget.stopCues().then((callback) {});
+              widget.cueListState(
+                () {
+                  for (Cue cue in widget.cues) {
+                    debugPrint(
+                        'Cue ${cue.name} ${cue.player.isPlaying()} State: ${cue.player.getPlayerState()}');
+                    cue.player.stopAudio();
+                    debugPrint("stopped cue: ${cue.cueNumber}");
+                  }
+                },
+              );
             },
           ),
           widget.addCues,
