@@ -101,16 +101,15 @@ class _PlaybackBarState extends State<PlaybackBar> {
             iconSize: iconSize,
             color: iconColor,
             tooltip: 'Pause All Cues',
-            onPressed: () async {
-              widget.cueListState(
-                () {
-                  for (Cue cue in widget.cues) {
-                    if (cue.player.isPlaying()) {
-                      cue.player.pauseAudio();
-                    }
-                  }
-                },
-              );
+            onPressed: () {
+              for (Cue cue in widget.cues) {
+                if (cue.player.isPlaying()) {
+                  widget.cueListState(() {
+                    cue.player.pauseAudio().then(
+                        (value) => debugPrint("paused cue: ${cue.cueNumber}"));
+                  });
+                }
+              }
             },
           ),
 
@@ -121,16 +120,18 @@ class _PlaybackBarState extends State<PlaybackBar> {
             color: iconColor,
             tooltip: 'Stop All Cues',
             onPressed: () {
-              widget.cueListState(
-                () {
-                  for (Cue cue in widget.cues) {
-                    debugPrint(
-                        'Cue ${cue.name} ${cue.player.isPlaying()} State: ${cue.player.getPlayerState()}');
+              for (Cue cue in widget.cues) {
+                debugPrint(
+                    'Cue ${cue.name} ${cue.player.isPlaying()} Playing: ${cue.player.isPlaying()}');
+                widget.cueListState(() {
+                  if (cue.player.isPlaying()) {
                     cue.player.stopAudio();
-                    debugPrint("stopped cue: ${cue.cueNumber}");
                   }
-                },
-              );
+                });
+
+                debugPrint("stopped cue: ${cue.cueNumber}");
+                debugPrint("Cue playing: ${cue.player.isPlaying()}");
+              }
             },
           ),
           widget.addCues,

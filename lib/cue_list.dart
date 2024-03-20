@@ -27,6 +27,7 @@ class _CueListState extends State<CueList> {
   Map<String, dynamic> _cueGoConfig = {};
   int selectedCue = 0;
   late Directory appDocsDir;
+
   @override
   void initState() {
     super.initState();
@@ -87,16 +88,23 @@ class _CueListState extends State<CueList> {
 
   /// Loads the project and the cue go config.
   Future<bool> getCueGoConfigAndProject() async {
-    appDocsDir = await getAppDocsDir();
-    Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
-    Map<String, dynamic> projectConfig =
-        await getProjectAsync(cueGoConfig['current_project'], appDocsDir);
-
-    _projectConfig = projectConfig;
-    _cueGoConfig = cueGoConfig;
-    List<Cue> cues = loadCues(projectConfig);
-    _cues = cues;
-    saveProject();
+    try {
+      appDocsDir = await getAppDocsDir();
+      debugPrint(appDocsDir.toString());
+      Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
+      debugPrint(cueGoConfig.toString());
+      Map<String, dynamic> projectConfig =
+          await getProjectAsync(cueGoConfig['current_project'], appDocsDir);
+      debugPrint(projectConfig.toString());
+      _projectConfig = projectConfig;
+      _cueGoConfig = cueGoConfig;
+      List<Cue> cues = loadCues(projectConfig);
+      _cues = cues;
+      saveProject();
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
     return true;
   }
 

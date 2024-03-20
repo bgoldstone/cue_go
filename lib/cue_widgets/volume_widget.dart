@@ -1,5 +1,5 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 /// Creates a Volume Slider widget with a [player] for the cue card.
 class VolumeSlider extends StatefulWidget {
