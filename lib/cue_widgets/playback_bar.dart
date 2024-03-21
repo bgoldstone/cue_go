@@ -72,19 +72,26 @@ class _PlaybackBarState extends State<PlaybackBar> {
                       widget.getSelectedCue() + 1 < widget.cues.length;
 
                   // play audio
-                  selectedCue.player
-                      .playAudio(selectedCue.path, widget.cues,
-                          widget.getSelectedCue(), widget.updateTimeLeft)
-                      .then((bool autoFollow) {
-                    if (autoFollow && isNextCue) {
-                      Cue nextCue = widget.cues[
-                          widget.getSelectedCue() + 1 % widget.cues.length];
-                      widget.setSelectedCue(
-                          widget.getSelectedCue() + 1 % widget.cues.length);
-                      nextCue.player.playAudio(nextCue.path, widget.cues,
-                          widget.getSelectedCue(), widget.updateTimeLeft);
-                    }
-                  });
+                  widget.cueListState(
+                    () {
+                      selectedCue.player
+                          .playAudio(selectedCue.path, widget.cues,
+                              widget.getSelectedCue(), widget.updateTimeLeft)
+                          .then(
+                        (bool autoFollow) {
+                          if (autoFollow && isNextCue) {
+                            Cue nextCue = widget.cues[widget.getSelectedCue() +
+                                1 % widget.cues.length];
+                            widget.setSelectedCue(widget.getSelectedCue() +
+                                1 % widget.cues.length);
+                            nextCue.player.playAudio(nextCue.path, widget.cues,
+                                widget.getSelectedCue(), widget.updateTimeLeft);
+                          }
+                        },
+                      );
+                    },
+                  );
+
                   // set next selected cue.
                   if (isNextCue) {
                     widget.setSelectedCue(
