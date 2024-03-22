@@ -13,12 +13,12 @@ class AudioPlayback {
   Future<bool> playAudio(String file, List<Cue> cues, int cueIndex,
       void Function(Cue, int) updateTimeLeft) async {
     bool returnValue = false;
-    player.setFilePath(file, preload: true);
-    player.play();
+    await player.setFilePath(file, preload: true);
     cueListState(() {
       Cue nextCue;
       bool isNextCue = cueIndex + 1 < cues.length;
       player.durationStream.listen((event) {
+        debugPrint("Player is playing audio: ${player.playing}");
         updateTimeLeft(cues[cueIndex], player.duration!.inSeconds);
       });
 
