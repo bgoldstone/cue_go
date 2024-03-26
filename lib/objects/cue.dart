@@ -1,5 +1,3 @@
-import 'audio_playback.dart';
-
 /// Cue object for the CueGo app.
 class Cue {
   String name;
@@ -8,7 +6,6 @@ class Cue {
   double endPosition = 0;
   String cueNumber = "";
   int secondsLeft = 0;
-  late AudioPlayback player;
   bool isAutoFollow = false;
   CueOption cueOption = CueOption.none;
   Cue(this.name, this.path);

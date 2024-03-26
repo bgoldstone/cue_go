@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:cue_go/cue_widgets/add_cues.dart';
 import 'package:cue_go/cue_widgets/cue_toggle_options.dart';
 import 'package:cue_go/cue_widgets/menu.dart';
-import 'package:cue_go/cue_widgets/playback_bar.dart';
-import 'package:cue_go/objects/audio_playback.dart';
 import 'package:cue_go/objects/cue.dart';
 import 'package:cue_go/objects/file_io.dart';
 import 'package:flutter/material.dart';
 
+import 'cue_widgets/add_cues.dart';
+import 'cue_widgets/playback_bar.dart';
 import 'cue_widgets/volume_widget.dart';
+import 'objects/audio.dart';
 
 /// Cue List Widget that displays the list of cues.
 class CueList extends StatefulWidget {
@@ -27,6 +27,7 @@ class _CueListState extends State<CueList> {
   Map<String, dynamic> _cueGoConfig = {};
   int selectedCue = 0;
   late Directory appDocsDir;
+  List<Audio> players = [];
 
   @override
   void initState() {
@@ -36,9 +37,9 @@ class _CueListState extends State<CueList> {
   @override
   void dispose() {
     super.dispose();
-    for (Cue cue in _cues) {
-      cue.player.player.stop();
-      cue.player.player.dispose();
+    for (Audio player in players) {
+      player.stop();
+      player.dispose();
     }
     // Saves the current project and the cue go config.
     Future.wait([
@@ -55,9 +56,9 @@ class _CueListState extends State<CueList> {
 
   /// Sets the index of the currently selected cue.
   void setSelectedCue(int index) {
-    setState(() {
-      selectedCue = index;
-    });
+    // setState(() {
+    //   selectedCue = index;
+    // });
   }
 
   /// Adds an audio cue to the list of cues.
@@ -72,7 +73,6 @@ class _CueListState extends State<CueList> {
     // Sets a default cue number.
     cue.cueNumber = '${_cues.length + 1}';
     //adds new playback object.
-    cue.player = AudioPlayback(cueListState: setState);
 
     _cues.add(cue);
     //adds audio cue to project config.
@@ -83,29 +83,26 @@ class _CueListState extends State<CueList> {
     });
     // Saves the project config.
     saveProject();
-    setState(() {});
+    dispose();
+    players.add(Audio(cue.path));
   }
 
   /// Loads the project and the cue go config.
-  Future<bool> getCueGoConfigAndProject() async {
+  Future<List<Cue>> getCueGoConfigAndProject() async {
     try {
       appDocsDir = await getAppDocsDir();
-      debugPrint(appDocsDir.toString());
       Map<String, dynamic> cueGoConfig = await getCueGoConfigAsync(appDocsDir);
-      debugPrint(cueGoConfig.toString());
       Map<String, dynamic> projectConfig =
           await getProjectAsync(cueGoConfig['current_project'], appDocsDir);
-      debugPrint(projectConfig.toString());
       _projectConfig = projectConfig;
       _cueGoConfig = cueGoConfig;
       List<Cue> cues = loadCues(projectConfig);
       _cues = cues;
       saveProject();
     } catch (e) {
-      debugPrint(e.toString());
-      return false;
+      return List<Cue>.empty();
     }
-    return true;
+    return _cues;
   }
 
   /// Loads the cues from the project config into the cue list.
@@ -118,12 +115,13 @@ class _CueListState extends State<CueList> {
         return [];
       }
       // maps the cue attributes to the cue object.
+      players.clear();
       for (Map<String, dynamic> cueMap in cueList) {
         Cue cue = Cue(cueMap['name'], cueMap['path']);
         cue.cueNumber = cueMap['cue_number'];
-        cue.player = AudioPlayback(cueListState: setState);
         cue.cueOption = CueOption.values[cueMap['cue_option']];
         cues.add(cue);
+        players.add(Audio(cue.path));
       }
     }
     return cues;
@@ -177,12 +175,12 @@ class _CueListState extends State<CueList> {
     await saveProject();
     Map<String, dynamic> newProject =
         await createProjectAsync(projectName, appDocsDir);
-
-    _cueGoConfig['current_project'] = projectName;
-    _projectConfig = newProject;
-    _projectConfig['name'] = projectName;
+    setState(() {
+      _cueGoConfig['current_project'] = projectName;
+      _projectConfig = newProject;
+      _projectConfig['name'] = projectName;
+    });
     await saveCueGoConfigAsync(_cueGoConfig, appDocsDir);
-    setState(() {});
   }
 
   /// Builds the ListView widget that displays the list of cues.
@@ -196,103 +194,134 @@ class _CueListState extends State<CueList> {
     );
     // get the cue at the index.
     Cue cue = _cues[index];
+    Audio player = players[index];
     return GestureDetector(
-      child: Card(
-        // set the color of the card based on if it is selected.
-        color: index == selectedCue ? Colors.green : Colors.green[900],
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+      child: Dismissible(
+          key: Key(index.toString()),
+          child: Card(
+            // set the color of the card based on if it is selected.
+            color: index == selectedCue ? Colors.green : Colors.green[900],
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
                 children: [
-                  // Displays the music note icon, the name of the cue, and the number of the cue
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.music_note,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        alignment: Alignment.center,
-                        child: TextButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) => editCueNameDialog(cue));
-                          },
-                          child: Text(
-                            cue.name,
-                            style: textStyle,
-                            overflow: TextOverflow.ellipsis,
+                      // Displays the music note icon, the name of the cue, and the number of the cue
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.music_note,
+                            color: Colors.black,
+                            size: 20,
                           ),
-                        ),
+                          Container(
+                            width: 100,
+                            height: 100,
+                            alignment: Alignment.center,
+                            child: TextButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        editCueNameDialog(cue));
+                              },
+                              child: Text(
+                                cue.name,
+                                style: textStyle,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            child: Text(
+                              'Cue: ${cue.cueNumber}',
+                              style: textStyle,
+                            ),
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => editCueNumberDialog(cue),
+                            ),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        child: Text(
-                          'Cue: ${cue.cueNumber}',
-                          style: textStyle,
-                        ),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) => editCueNumberDialog(cue),
-                        ),
+                      // Displays the player widget
+                      // Container(
+                      //   width: 200,
+                      //   height: 150,
+                      //   alignment: Alignment.center,
+                      //   child: PlayerWidget(
+                      //     player: player.player,
+                      //     cue: cue,
+                      //   ),
+                      // ),
+                      // Displays the volume slider
+                      Row(
+                        children: [
+                          VolumeSlider(player: player.player),
+                        ],
                       ),
                     ],
                   ),
-                  // Displays the player widget
-                  // Container(
-                  //   width: 200,
-                  //   height: 150,
-                  //   alignment: Alignment.center,
-                  //   child: PlayerWidget(
-                  //     player: cue.player.player,
-                  //     cue: cue,
-                  //   ),
-                  // ),
-                  // Displays the volume slider
+                  // Displays the toggle options.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CueToggleOptions(
+                        cue: cue,
+                        setNewOption: (CueOption option) {
+                          setState(() {
+                            cue.cueOption = option;
+                          });
+                          saveProject();
+                        },
+                      ),
+                    ],
+                  ),
                   Row(
                     children: [
-                      VolumeSlider(player: cue.player.player),
+                      IconButton(
+                        onPressed: () {
+                          player.play();
+                          // setState(() {
+                          //   selectedCue = (index + 1) % _cues.length;
+                          // });
+                        },
+                        icon: player.isPlaying
+                            ? const Icon(Icons.play_arrow_outlined)
+                            : const Icon(Icons.play_arrow),
+                        tooltip: "Play Audio",
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          player.stop();
+                        },
+                        icon: const Icon(Icons.stop),
+                        tooltip: "Stop Audio",
+                      ),
                     ],
-                  ),
+                  )
                 ],
               ),
-              // Displays the toggle options.
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CueToggleOptions(
-                    cue: cue,
-                    setNewOption: (CueOption option) {
-                      cue.cueOption = option;
-                      saveProject();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              )
-            ],
+            ),
           ),
-        ),
-      ),
+          onDismissed: (direction) {
+            deleteCue(index);
+          }),
       // Changes the current cue to the selected cue.
       onTap: () {
-        setState(() {
-          selectedCue = index;
-        });
+        // setState(() {
+        //   selectedCue = index;
+        // });
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final Future<void> initializeProject = getCueGoConfigAndProject();
+    final Future<List<Cue>> initializeProject = getCueGoConfigAndProject();
     return FutureBuilder(
       future: initializeProject,
       builder: (context, future) {
@@ -319,7 +348,7 @@ class _CueListState extends State<CueList> {
                   ),
                 ),
                 PlaybackBar(
-                  cues: _cues,
+                  players: players,
                   setSelectedCue: setSelectedCue,
                   getSelectedCue: getSelectedCue,
                   updateTimeLeft: (cue, secondsLeft) {
@@ -407,5 +436,15 @@ class _CueListState extends State<CueList> {
         )
       ],
     );
+  }
+
+  void deleteCue(int index) {
+    setState(() {
+      saveProject();
+      players.removeAt(index);
+      setState(() {
+        _cues.removeAt(index);
+      });
+    });
   }
 }
