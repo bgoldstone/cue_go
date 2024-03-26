@@ -21,5 +21,9 @@ jobs:
         with:
           flutter-version: '3.16.9'
           channel: 'stable'
-      - run: flutter --version
+      - run: flutter clean
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter build
+      - run: flutter test
             
