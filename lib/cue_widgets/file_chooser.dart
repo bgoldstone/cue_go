@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 
 /// Pick a file from the file system. Returns null if the user cancels.
-Future<String?> pickAudio() async {
+Future<List<PlatformFile>?> pickAudio() async {
   FilePickerResult? result = await FilePicker.platform
-      .pickFiles(type: FileType.audio, allowMultiple: false);
+      .pickFiles(type: FileType.audio, allowMultiple: true);
   if (result == null) return null;
-  return result.files.single.path;
+  return result.files;
 }
 
 /// Pick a project from the file system. Returns null if the user cancels.
@@ -16,7 +16,7 @@ Future<String?> pickProject(Directory appDocsDir) async {
     type: FileType.custom,
     allowedExtensions: ['json'],
     allowMultiple: false,
-    initialDirectory: '${appDocsDir.path}/cue_go',
+    initialDirectory: appDocsDir.path,
   );
   if (result == null) return null;
   // Returns the path of the picked file.

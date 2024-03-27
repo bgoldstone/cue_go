@@ -1,34 +1,38 @@
 import 'package:just_audio/just_audio.dart';
 
 class Audio {
-  late final AudioPlayer _player;
+  final AudioPlayer player;
   Duration _position = Duration.zero;
-  void _initializePlayer(String filePath) {
-    // Replace the URL with a valid audio file URL
-    _player.setFilePath(filePath).then((_) => _player.stop().then((_) => null));
-    _position = _player.position;
-  }
-
-  AudioPlayer get player => _player;
-  bool get isPlaying => _player.playing;
+  AudioPlayer get getPlayer => player;
+  bool get isPlaying => player.playing;
   int get position => _position.inSeconds;
   bool get isPaused => _position.inSeconds != 0;
 
-  Audio(String filePath) {
-    _player = AudioPlayer();
+  Audio(
+      {required this.player,
+      required String filePath,
+      required void Function(Audio player) addToPlayerList}) {
     _initializePlayer(filePath);
+    addToPlayerList(this);
+  }
+  void _initializePlayer(String filePath) async {
+    // Replace the URL with a valid audio file URL
+    await player
+        .setAudioSource(AudioSource.file(filePath.replaceAll('file://', '')));
+    await player.stop();
+    _position = player.position;
   }
 
   void dispose() {
-    _player.dispose();
+    player.dispose();
   }
 
   Future<void> play() async {
-    await _player.seek(_position);
-    await _player.play();
+    await player.seek(_position);
+    await player.play();
   }
 
   Future<void> stop() async {
-    await _player.stop();
+    await player.stop();
   }
 }

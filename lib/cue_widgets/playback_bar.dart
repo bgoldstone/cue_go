@@ -24,7 +24,7 @@ class PlaybackBar extends StatefulWidget {
   final Function(int) setSelectedCue;
   final int Function() getSelectedCue;
   final Function(Cue, int) updateTimeLeft;
-  final List<Audio> players;
+  final List<Audio> Function() players;
   final AddCues addCues;
   final void Function(void Function()) cueListState;
 
@@ -64,9 +64,10 @@ class _PlaybackBarState extends State<PlaybackBar> {
               splashRadius: 5,
               tooltip: 'Play Selected Cue',
               onPressed: () {
-                widget.players[widget.getSelectedCue()].play();
+                debugPrint(widget.players().toString());
+                widget.players()[widget.getSelectedCue()].play();
                 widget.setSelectedCue(
-                    (widget.getSelectedCue() + 1) % widget.players.length);
+                    (widget.getSelectedCue() + 1) % widget.players().length);
               },
             ),
           ),
@@ -78,7 +79,7 @@ class _PlaybackBarState extends State<PlaybackBar> {
             color: iconColor,
             tooltip: 'Stop All Cues',
             onPressed: () {
-              for (Audio player in widget.players) {
+              for (Audio player in widget.players()) {
                 player.stop();
               }
             },

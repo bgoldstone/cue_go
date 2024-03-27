@@ -1,4 +1,5 @@
 import 'package:cue_go/cue_widgets/file_chooser.dart';
+import 'package:file_picker/src/platform_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -36,9 +37,11 @@ class AddCues extends StatelessWidget {
 
   /// Pick an audio file from the file system and call [audioCueCallback] with
   void pickAudioFile() async {
-    String? file = await pickAudio();
+    List<PlatformFile>? file = await pickAudio();
     if (file != null) {
-      audioCueCallback(file);
+      for (PlatformFile f in file) {
+        audioCueCallback(f.path);
+      }
     }
   }
 }
