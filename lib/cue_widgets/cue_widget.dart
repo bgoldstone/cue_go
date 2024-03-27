@@ -12,6 +12,7 @@ class CueWidget extends StatefulWidget {
   final void Function(int index) deleteCue;
   final void Function(Audio player) addToPlayerList;
   final void Function(int index) setSelectedCue;
+  final int Function() getNumberOfCues;
   const CueWidget(
       {super.key,
       required this.cue,
@@ -19,7 +20,8 @@ class CueWidget extends StatefulWidget {
       required this.deleteCue,
       required this.isSelected,
       required this.addToPlayerList,
-      required this.setSelectedCue});
+      required this.setSelectedCue,
+      required this.getNumberOfCues});
 
   @override
   State<CueWidget> createState() => _CueWidgetState();
@@ -29,7 +31,8 @@ class _CueWidgetState extends State<CueWidget> {
   late final Audio player = Audio(
       filePath: widget.cue.path,
       player: AudioPlayer(),
-      addToPlayerList: widget.addToPlayerList);
+      addToPlayerList: widget.addToPlayerList,
+      setStateCallback: setState);
   @override
   void dispose() {
     super.dispose();
@@ -138,9 +141,10 @@ class _CueWidgetState extends State<CueWidget> {
                       IconButton(
                         onPressed: () {
                           player.play();
-                          // setState(() {
-                          //   selectedCue = (widget.index + 1) % _cues.length;
-                          // });
+                          setState(() {
+                            widget.setSelectedCue(
+                                (widget.index + 1) % widget.getNumberOfCues());
+                          });
                         },
                         icon: player.isPlaying
                             ? const Icon(
@@ -153,6 +157,7 @@ class _CueWidgetState extends State<CueWidget> {
                       IconButton(
                         onPressed: () {
                           player.stop();
+                          setState(() {});
                         },
                         icon: const Icon(Icons.stop),
                         tooltip: "Stop Audio",

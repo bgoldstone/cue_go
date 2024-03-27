@@ -82,6 +82,7 @@ class _PlaybackBarState extends State<PlaybackBar> {
               for (Audio player in widget.players()) {
                 player.stop();
               }
+              setState(() {});
             },
           ),
           widget.addCues,

@@ -7,11 +7,13 @@ class Audio {
   bool get isPlaying => player.playing;
   int get position => _position.inSeconds;
   bool get isPaused => _position.inSeconds != 0;
+  void Function(Function()) setStateCallback;
 
   Audio(
       {required this.player,
       required String filePath,
-      required void Function(Audio player) addToPlayerList}) {
+      required void Function(Audio player) addToPlayerList,
+      required this.setStateCallback}) {
     _initializePlayer(filePath);
     addToPlayerList(this);
   }
@@ -28,7 +30,6 @@ class Audio {
   }
 
   Future<void> play() async {
-    await player.seek(_position);
     await player.play();
   }
 

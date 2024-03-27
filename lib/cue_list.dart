@@ -189,7 +189,12 @@ class _CueListState extends State<CueList> {
         debugPrint('Player $players');
       },
       setSelectedCue: setSelectedCue,
+      getNumberOfCues: getNumberOfCues,
     );
+  }
+
+  int getNumberOfCues() {
+    return _cues.length;
   }
 
   @override
